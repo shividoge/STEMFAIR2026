@@ -42,25 +42,31 @@
       </div>
 
       <div class="card">
-        <h2>2) Train (optional but recommended)</h2>
-        <p class="small">
-          Upload your historical trials CSV to fit two linear models:
-          (a) final_area from video features, (b) final_mass from video features.
-        </p>
-        <input id="trainCsvInput" type="file" accept=".csv,text/csv" />
-        <div class="small">
-          Required columns in training CSV:
-          <code>trial_id</code>, <code>final_area_cm2</code>, <code>final_mass_g</code>,
-          plus feature columns produced by this app (see “Export features” below).
-        </div>
+  <h2>2) Upload trial data & select trial for validation</h2>
+  <p class="small">
+    Upload your trial ground-truth CSV, then select which trial this video corresponds to. The app will autofill the
+    actual final area and mass, and compute accuracy.
+  </p>
 
-        <div class="row">
-          <button id="fitBtn" class="primary" disabled>Fit regression from CSV</button>
-          <button id="exportFeaturesBtn" class="ghost" disabled>Export features CSV (this video)</button>
-        </div>
+  <input id="trialCsvInput" type="file" accept=".csv,text/csv" />
 
-        <div class="small" id="modelStatus">Model status: not fit (will use default coefficients).</div>
-      </div>
+  <div class="row">
+    <div class="field">
+      <label>Select trial</label>
+      <select id="trialSelect" disabled>
+        <option value="">— Upload CSV first —</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="small">
+    Required CSV columns:
+    <code>trial_id</code>, <code>final_area_cm2</code>, <code>final_mass_g</code>
+  </div>
+
+  <div class="small" id="trialDataStatus">Trial data: not loaded.</div>
+</div>
+
 
       <div class="card">
         <h2>3) Predict and evaluate</h2>
@@ -120,3 +126,4 @@
   <script src="app.js"></script>
 </body>
 </html>
+
