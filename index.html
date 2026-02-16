@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lettuce Yield Predictor (Top-Down CV)</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <h1>Lettuce Yield Predictor</h1>
+      <p class="subtitle">
+        Computer-vision extraction of projected leaf area from 60-second top-down clips, with in-browser regression to predict final yield.
+      </p>
+    </header>
+
+    <section class="grid">
+      <div class="card">
+        <h2>1) Upload video</h2>
+        <input id="videoInput" type="file" accept="video/mp4,video/quicktime,video/*" />
+        <div class="row">
+          <button id="analyzeBtn" class="primary" disabled>Analyze video</button>
+          <button id="resetBtn" class="ghost" disabled>Reset</button>
+        </div>
+
+        <div class="small">
+          Fixed assumptions: top-down view, consistent lighting/background, lettuce is the dominant green object.
+        </div>
+
+        <div class="preview">
+          <video id="video" controls playsinline></video>
+          <canvas id="canvas"></canvas>
+        </div>
+
+        <div class="row metrics">
+          <div><span class="k">Frames sampled</span><span id="framesSampled" class="v">—</span></div>
+          <div><span class="k">Mean area (px)</span><span id="meanAreaPx" class="v">—</span></div>
+          <div><span class="k">Max area (px)</span><span id="maxAreaPx" class="v">—</span></div>
+          <div><span class="k">Area slope (px/s)</span><span id="slopePxPerS" class="v">—</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>2) Train (optional but recommended)</h2>
+        <p class="small">
+          Upload your historical trials CSV to fit two linear models:
+          (a) final_area from video features, (b) final_mass from video features.
+        </p>
+        <input id="trainCsvInput" type="file" accept=".csv,text/csv" />
+        <div class="small">
+          Required columns in training CSV:
+          <code>trial_id</code>, <code>final_area_cm2</code>, <code>final_mass_g</code>,
+          plus feature columns produced by this app (see “Export features” below).
+        </div>
+
+        <div class="row">
+          <button id="fitBtn" class="primary" disabled>Fit regression from CSV</button>
+          <button id="exportFeaturesBtn" class="ghost" disabled>Export features CSV (this video)</button>
+        </div>
+
+        <div class="small" id="modelStatus">Model status: not fit (will use default coefficients).</div>
+      </div>
+
+      <div class="card">
+        <h2>3) Predict and evaluate</h2>
+        <div class="row">
+          <div class="field">
+            <label>Trial ID (for your records)</label>
+            <input id="trialId" type="text" placeholder="e.g., T12" />
+          </div>
+          <div class="field">
+            <label>Actual final area (cm²)</label>
+            <input id="actualArea" type="number" step="0.01" placeholder="optional" />
+          </div>
+          <div class="field">
+            <label>Actual final mass (g)</label>
+            <input id="actualMass" type="number" step="0.01" placeholder="optional" />
+          </div>
+        </div>
+
+        <div class="row">
+          <button id="predictBtn" class="primary" disabled>Predict</button>
+        </div>
+
+        <div class="predictions">
+          <div class="pred">
+            <div class="k">Predicted final area (cm²)</div>
+            <div id="predArea" class="v big">—</div>
+          </div>
+          <div class="pred">
+            <div class="k">Predicted final mass (g)</div>
+            <div id="predMass" class="v big">—</div>
+          </div>
+        </div>
+
+        <h3>Evaluation (if actuals provided)</h3>
+        <div class="row metrics">
+          <div><span class="k">Area error (abs)</span><span id="areaAbsErr" class="v">—</span></div>
+          <div><span class="k">Area error (MAPE)</span><span id="areaMape" class="v">—</span></div>
+          <div><span class="k">Mass error (abs)</span><span id="massAbsErr" class="v">—</span></div>
+          <div><span class="k">Mass error (MAPE)</span><span id="massMape" class="v">—</span></div>
+        </div>
+
+        <div class="small note">
+          If predicted mass shows as 0, it is almost always because the model is not fit and/or
+          features are near-zero due to segmentation failing (threshold mismatch or no green detected).
+          This implementation includes diagnostic outputs to catch that.
+        </div>
+
+        <pre id="log" class="log"></pre>
+      </div>
+    </section>
+
+    <footer class="footer small">
+      Designed for controlled hydroponic top-down imaging. For publication-grade use, report camera geometry, calibration constant, and segmentation parameters.
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
