@@ -61,6 +61,8 @@ input{
   outline:none;
 }
 
+select{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:#0c1220;color:var(--text);outline:none}
+
 button{
   border:none;
   border-radius:12px;
@@ -134,3 +136,4 @@ video, canvas{
 
 .footer{margin-top:14px;text-align:center}
 code{background:#0c1220;border:1px solid var(--border);padding:1px 6px;border-radius:8px}
+
